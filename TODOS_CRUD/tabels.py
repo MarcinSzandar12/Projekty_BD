@@ -16,18 +16,18 @@ def execute_sql(conn, sql):
 if __name__ == "__main__":
     
    create_tasks_sql = """
-   -- zadanie table
+   -- task table
    CREATE TABLE IF NOT EXISTS tasks (
-      Zadanie_id integer PRIMARY KEY,
-      tytuł VARCHAR(250) NOT NULL,
-      opis TEXT,
-      status VARCHAR(15) NOT NULL,
+      task_id integer PRIMARY KEY,
+      title VARCHAR(250) NOT NULL,
+      destription TEXT,
+      status VARCHAR(15) NOT NULL
    );
    """
 
    db_file = "todos.db"
 
-   conn = todos.create_connection(db_file)
+   conn = todos.create_connection()
    if conn is not None:
        execute_sql(conn, create_tasks_sql)
        conn.close()

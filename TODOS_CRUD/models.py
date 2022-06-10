@@ -1,22 +1,18 @@
-import json
 import sqlite3
 from sqlite3 import Error
 
 class TodosSQLite:
-    def __init__(self):
-        try:
-            with open("todos.json", "r") as f:
-                self.todos = json.load(f)
-        except FileNotFoundError:
-            self.todos = []
+    def __init__(self, db_file):
+        self.db_file = db_file     
 
     def all(self):
-        return self.todos     
+        with self.create_connection() as conn:
+            return self.select_all(conn, "tasks")   
 
-    def create_connection(db_file):
+    def create_connection(self):
         conn = None
         try:
-            conn = sqlite3.connect(db_file)
+            conn = sqlite3.connect(self.db_file)
             return conn
         except Error as e:
             print(e)
@@ -34,37 +30,35 @@ class TodosSQLite:
             if conn:
                 conn.close()
 
-    def save_all(self):
-        with open("todos.json", "w") as f:
-            json.dump(self.todos, f)
-
-    def add_task(self, conn, zadanie):
-        sql = '''INSERT INTO tasks(Zadanie_id, tytuł, opis, status)
+    def add_task(self, zadanie):
+        sql = '''INSERT INTO tasks(task_id, title, description, status)
              VALUES(?,?,?,?)'''
-        cur = conn.cursor()
-        cur.execute(sql, zadanie)
-        conn.commit()
-        self.save_all()        
+        with self.create_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, zadanie)
+            conn.commit()       
 
-    def select_all(conn, table):
-        cur = conn.cursor()
-        cur.execute(f"SELECT * FROM {table}")
-        rows = cur.fetchall()
-        return rows
+    def select_all(self, table):
+        with self.create_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(f"SELECT * FROM {table}")
+            rows = cur.fetchall()
+            return rows
 
-    def select_where(conn, table, **query):
-        cur = conn.cursor()
-        qs = []
-        values = ()
-        for k, v in query.items():
-            qs.append(f"{k}=?")
-            values += (v,)
-        q = " AND ".join(qs)
-        cur.execute(f"SELECT * FROM {table} WHERE {q}", values)
-        rows = cur.fetchall()
-        return rows
+    def select_where(self, table, **query):
+        with self.create_connection() as conn:
+            cur = conn.cursor()
+            qs = []
+            values = ()
+            for k, v in query.items():
+                qs.append(f"{k}=?")
+                values += (v,)
+            q = " AND ".join(qs)
+            cur.execute(f"SELECT * FROM {table} WHERE {q}", values)
+            rows = cur.fetchall()
+            return rows
 
-    def update(self, conn, table, id, **kwargs):
+    def update(self, table, id, **kwargs):
         parameters = [f"{k} = ?" for k in kwargs]
         parameters = ", ".join(parameters)
         values = tuple(v for v in kwargs.values())
@@ -73,16 +67,16 @@ class TodosSQLite:
         sql = f''' UPDATE {table}
              SET {parameters}
              WHERE id = ?'''
-        try:
-            cur = conn.cursor()
-            cur.execute(sql, values)
-            conn.commit()
-            self.save_all()
-            print("OK")
-        except sqlite3.OperationalError as e:
-            print(e)
+        with self.create_connection() as conn:
+            try:
+                cur = conn.cursor()
+                cur.execute(sql, values)
+                conn.commit()
+                print("OK")
+            except sqlite3.OperationalError as e:
+                print(e)
         
-    def delete_where(self, conn, table, **kwargs):
+    def delete_where(self, table, **kwargs):
         qs = []
         values = tuple()
         for k, v in kwargs.items():
@@ -91,11 +85,11 @@ class TodosSQLite:
         q = " AND ".join(qs)
 
         sql = f'DELETE FROM {table} WHERE {q}'
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        conn.commit()
-        self.save_all()
-        print("Deleted")
+        with self.create_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, values)
+            conn.commit()
+            print("Deleted")
         
 
-todos = TodosSQLite()
+todos = TodosSQLite("todos.db")

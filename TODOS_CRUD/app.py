@@ -3,7 +3,6 @@ from models import todos
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "nininini"
-CONN = todos.create_connection("todos.db")
 
 @app.errorhandler(404)
 def not_found(error):
@@ -15,7 +14,8 @@ def bad_request(error):
 
 @app.route("/api/v1/todos/", methods=["GET"])
 def todos_list_api_v1():
-    return todos.all()
+    todosall = todos.all()
+    return jsonify(todosall)
 
 @app.route("/api/v1/todos/<int:task_id>", methods=["GET"])
 def get_todo(task_id):
@@ -27,12 +27,12 @@ def get_todo(task_id):
 
 @app.route("/api/v1/todos/", methods=["POST"])
 def create_todo():
-    if not request.json or not 'tytuł' in request.json:
+    if not request.json or not 'title' in request.json:
         abort(400)
     todo = {
-        'Zadanie_id': todos.all()[-1]['id'] + 1,
-        'tytuł': request.json['tytuł'],
-        'opis': request.json.get('opis', ""),
+        'task_id': todos.all()[-1]['id'] + 1,
+        'title': request.json['tytuł'],
+        'description': request.json.get('opis', ""),
         'status': False
     }
     todos.add_task(todo)
@@ -56,17 +56,17 @@ def update_todo(task_id):
         abort(400)
     data = request.json
     if any([
-        'tytuł' in data and not isinstance(data.get('tytuł'), str),
-        'opis' in data and not isinstance(data.get('opis'), str),
+        'title' in data and not isinstance(data.get('title'), str),
+        'description' in data and not isinstance(data.get('description'), str),
         'status' in data and not isinstance(data.get('status'), bool)
     ]):
         abort(400)
     todo = {
-        'tytuł': data.get('tytuł', todo['tytuł']),
-        'opis': data.get('opis', todo['opis']),
+        'title': data.get('tytuł', todo['title']),
+        'description': data.get('opis', todo['description']),
         'status': data.get('status', todo['status'])
     }
-    todos.update(task_id, todo)
+    todos.update(table, task_id, todo)
     return jsonify({'todo': todo})
 
 if __name__ == "__main__":
