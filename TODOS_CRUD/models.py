@@ -38,7 +38,7 @@ class TodosSQLite:
             cur.execute(sql, zadanie)
             conn.commit()       
 
-    def select_all(self, table):
+    def select_all(self, conn, table):
         with self.create_connection() as conn:
             cur = conn.cursor()
             cur.execute(f"SELECT * FROM {table}")

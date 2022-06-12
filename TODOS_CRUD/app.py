@@ -20,7 +20,7 @@ def todos_list_api_v1():
 @app.route("/api/v1/todos/<int:task_id>", methods=["GET"])
 def get_todo(task_id):
     table = "tasks"
-    todo = todos.select_where(table, task_id)
+    todo = todos.select_where(table, task_id=task_id)
     if not todo:
         abort(404)
     return jsonify({"todo": todo})
@@ -41,7 +41,7 @@ def create_todo():
 @app.route("/api/v1/todos/<int:task_id>", methods=['DELETE'])
 def delete_todo(task_id):
     table = "tasks"
-    result = todos.delete_where(table, task_id)
+    result = todos.delete_where(table, task_id=task_id)
     if not result:
         abort(404)
     return jsonify({'result': result})
@@ -49,7 +49,7 @@ def delete_todo(task_id):
 @app.route("/api/v1/todos/<int:task_id>", methods=["PUT"])
 def update_todo(task_id):
     table = "tasks"
-    todo = todos.select_where(table, task_id)
+    todo = todos.select_where(table, task_id=task_id)
     if not todo:
         abort(404)
     if not request.json:

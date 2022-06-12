@@ -18,7 +18,7 @@ if __name__ == "__main__":
    create_tasks_sql = """
    -- task table
    CREATE TABLE IF NOT EXISTS tasks (
-      task_id integer PRIMARY KEY,
+      task_id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
       title VARCHAR(250) NOT NULL,
       destription TEXT,
       status VARCHAR(15) NOT NULL
