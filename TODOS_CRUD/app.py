@@ -42,13 +42,14 @@ def delete_todo(task_id):
     table = "tasks"
     result = todos.delete_where(table, task_id=task_id)
     if not result:
-        abort(404)
-    return jsonify({'result': result})
+        return jsonify({'result': result})
 
 @app.route("/api/v1/todos/<int:task_id>", methods=["PUT"])
 def update_todo(task_id):
     table = "tasks"
-    todo = todos.select_where(table, task_id=task_id)
+    todoit = todos.select_where(table, task_id=task_id)
+    todo = todoit and todoit[0]
+    print(todo)
     if not todo:
         abort(404)
     if not request.json:
@@ -61,9 +62,9 @@ def update_todo(task_id):
     ]):
         abort(400)
     todo = {
-        'title': data.get('tytuł', todo['title']),
-        'description': data.get('opis', todo['description']),
-        'status': data.get('status', todo['status'])
+        'title': data.get('title', todo[0]),
+        'description': data.get('description', todo[1]),
+        'status': data.get('status', todo[2])
     }
     todos.update(table, task_id, todo)
     return jsonify({'todo': todo})
