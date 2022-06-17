@@ -20,7 +20,7 @@ if __name__ == "__main__":
    CREATE TABLE IF NOT EXISTS tasks (
       task_id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
       title VARCHAR(250) NOT NULL,
-      destription TEXT,
+      description TEXT,
       status VARCHAR(15) NOT NULL
    );
    """

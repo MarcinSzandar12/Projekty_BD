@@ -30,12 +30,12 @@ class TodosSQLite:
             if conn:
                 conn.close()
 
-    def add_task(self, zadanie):
-        sql = '''INSERT INTO tasks(task_id, title, description, status)
-             VALUES(?,?,?,?)'''
+    def add_task(self, tasks):
+        sql = '''INSERT INTO tasks(title, description, status)
+             VALUES(?,?,?)'''
         with self.create_connection() as conn:
             cur = conn.cursor()
-            cur.execute(sql, zadanie)
+            cur.execute(sql, tasks)
             conn.commit()       
 
     def select_all(self, conn, table):

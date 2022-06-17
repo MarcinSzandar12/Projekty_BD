@@ -29,12 +29,11 @@ def get_todo(task_id):
 def create_todo():
     if not request.json or not 'title' in request.json:
         abort(400)
-    todo = {
-        'task_id': todos.all()[-1]['id'] + 1,
-        'title': request.json['tytuł'],
-        'description': request.json.get('opis', ""),
-        'status': False
-    }
+    todo = (
+        request.json['title'],
+        request.json.get('description', ""),
+        False
+    )
     todos.add_task(todo)
     return jsonify({'todo': todo}), 201
 
