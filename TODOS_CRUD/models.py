@@ -58,15 +58,15 @@ class TodosSQLite:
             rows = cur.fetchall()
             return rows
 
-    def update(self, table, id, **kwargs):
+    def update(self, table, task_id, **kwargs):
         parameters = [f"{k} = ?" for k in kwargs]
         parameters = ", ".join(parameters)
         values = tuple(v for v in kwargs.values())
-        values += (id, )
+        values += (task_id, )
 
         sql = f''' UPDATE {table}
              SET {parameters}
-             WHERE id = ?'''
+             WHERE task_id = ?'''
         with self.create_connection() as conn:
             try:
                 cur = conn.cursor()

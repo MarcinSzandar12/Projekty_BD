@@ -49,7 +49,6 @@ def update_todo(task_id):
     table = "tasks"
     todoit = todos.select_where(table, task_id=task_id)
     todo = todoit and todoit[0]
-    print(todo)
     if not todo:
         abort(404)
     if not request.json:
@@ -62,11 +61,11 @@ def update_todo(task_id):
     ]):
         abort(400)
     todo = {
-        'title': data.get('title', todo[0]),
-        'description': data.get('description', todo[1]),
-        'status': data.get('status', todo[2])
+        'title': data.get('title', todo[1]),
+        'description': data.get('description', todo[2]),
+        'status': data.get('status', todo[3])
     }
-    todos.update(table, task_id, todo)
+    todos.update(table, task_id, **todo)
     return jsonify({'todo': todo})
 
 if __name__ == "__main__":
